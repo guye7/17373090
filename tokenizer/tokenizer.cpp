@@ -87,17 +87,33 @@ namespace miniplc0 {
 						break;
 					case '-':
 						// 请填空：切换到减号的状态
+						current_state = DFAState::MINUS_SIGN_STATE;
+						break;
 					case '+':
 						// 请填空：切换到加号的状态
+						current_state = DFAState::PLUS_SIGN_STATE;
+						break;
 					case '*':
 						// 请填空：切换状态
+						current_state = DFAState::MULTIPLICATION_SIGN_STATE;
+						break;
 					case '/':
 						// 请填空：切换状态
-
+						current_state = DFAState::DIVISION_SIGN_STATE;
+						break;
+					
 					///// 请填空：
 					///// 对于其他的可接受字符
 					///// 切换到对应的状态
-
+					case '(':
+						current_state = DFAState::LEFTBRACKET_STATE;
+						break;
+					case ')':
+						current_state = DFAState::RIGHTBRACKET_STATE;
+						break;
+					case ';':
+						current_state = DFAState::SEMICOLON_STATE;
+						break;
 					// 不接受的字符导致的不合法的状态
 					default:
 						invalid = true;
@@ -124,6 +140,8 @@ namespace miniplc0 {
 			case UNSIGNED_INTEGER_STATE: {
 				// 请填空：
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串为整数
+
+				
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				// 如果读到的字符是数字，则存储读到的字符
 				// 如果读到的是字母，则存储读到的字符，并切换状态到标识符
@@ -150,12 +168,43 @@ namespace miniplc0 {
 								  // 当前状态为减号的状态
 			case MINUS_SIGN_STATE: {
 				// 请填空：回退，并返回减号token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::MINUS_SIGN, '-', pos, currentPos()), std::optional<CompilationError>());
 			}
 
 								   // 请填空：
 								   // 对于其他的合法状态，进行合适的操作
 								   // 比如进行解析、返回token、返回编译错误
-
+			case EQUAL_SIGN_STATE: {
+				// 回退，并返回token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::EQUAL_SIGN, '=', pos, currentPos()), std::optional<CompilationError>());
+			}
+			case MULTIPLICATION_SIGN_STATE: {
+				// 回退，并返回token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::MULTIPLICATION_SIGN, '*', pos, currentPos()), std::optional<CompilationError>());
+			}
+			case DIVISION_SIGN_STATE: {
+				// 回退，并返回token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::DIVISION_SIGN, '/', pos, currentPos()), std::optional<CompilationError>());
+			}
+			case LEFTBRACKET_STATE: {
+				// 回退，并返回token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::LEFT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
+			}
+			case RIGHTBRACKET_STATE: {
+				// 回退，并返回token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, ')', pos, currentPos()), std::optional<CompilationError>());
+			}
+			case SEMICOLON_STATE: {
+				// 回退，并返回 分token
+				unreadLast();
+				return std::make_pair(std::make_optional<Token>(TokenType::SEMICOLON, ';', pos, currentPos()), std::optional<CompilationError>());
+			}
 								   // 预料之外的状态，如果执行到了这里，说明程序异常
 			default:
 				DieAndPrint("unhandled state.");
